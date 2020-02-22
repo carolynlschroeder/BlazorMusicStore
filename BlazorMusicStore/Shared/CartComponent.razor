@@ -1,0 +1,17 @@
+﻿@using BlazorMusicStore.Data
+@inject AppState AppState
+<a href="/shoppingCart">Cart (@AppState.CartCount)</a>
+
+@code {
+    protected override void OnInitialized()
+    {
+        AppState.OnChange += StateHasChanged;
+    }
+
+    public void Dispose()
+    {
+        AppState.OnChange -= StateHasChanged;
+    }
+
+}
+

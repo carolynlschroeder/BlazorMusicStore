@@ -1,0 +1,27 @@
+﻿@page "/store"
+@using BlazorMusicStore.Data
+@inject MusicStoreService MusicStoreService
+    <div>
+        <h3>Browse Genres</h3>
+        <p>
+            Select from @genres.Count() genres:
+        </p>
+
+        <ul>
+            @foreach (var g in genres)
+            {
+                <li><a href="/browse/@g.GenreId">@g.Name</a></li>
+            }
+        </ul>
+    </div>
+
+@code {
+
+    List<Genre> genres;
+
+    protected override async Task OnInitializedAsync()
+    {
+        genres = await MusicStoreService.GetGenresAsync();
+    }
+
+}

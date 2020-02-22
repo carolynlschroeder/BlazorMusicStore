@@ -1,0 +1,41 @@
+﻿@page "/"
+@using BlazorMusicStore.Data
+@inject MusicStoreService MusicStoreService
+
+<div id="promotion">
+</div>
+
+<h3><em>Fresh</em> off the grill</h3>
+
+@if (topSellingAlbums == null)
+{
+    <p><em>Loading...</em></p>
+}
+else
+{
+    <ul id="album-list">
+        @foreach (var album in topSellingAlbums)
+        {
+            <li>
+                <a href="/details/@album.AlbumId">
+                    <img alt="@album.Title" src="@album.AlbumArtUrl" />
+                    <span>@album.Title</span>
+                </a>
+            </li>
+        }
+    </ul>
+}
+
+@code{
+
+    List<Album> topSellingAlbums;
+
+    public int cartCount;
+
+    protected override async Task OnInitializedAsync()
+    {
+        topSellingAlbums = await MusicStoreService.GetTopSellingAlbums(5);
+    }
+
+
+}

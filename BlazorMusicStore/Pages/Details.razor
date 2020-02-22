@@ -1,0 +1,55 @@
+﻿@page "/details/{AlbumId:int}"
+@using BlazorMusicStore.Data
+@inject MusicStoreService MusicStoreService
+@inject AppState AppState
+@inject NavigationManager NavManager
+
+
+<h2>@album.Title</h2>
+
+<p>
+    <img alt="@album.Title" src="@album.AlbumArtUrl" />
+</p>
+
+<div id="album-details">
+    <p>
+        <em>Genre:</em>
+        @album.Genre.Name
+    </p>
+    <p>
+        <em>Artist:</em>
+        @album.Artist.Name
+    </p>
+    <p>
+        <em>Price:</em>
+        @String.Format("{0:F}", album.Price)
+    </p>
+    <button @onclick="@(() => AddToCart(album.AlbumId))" class="button">Add To Cart</button>
+</div>
+
+
+
+@code {
+
+
+    Album album;
+
+    [Parameter]
+    public int AlbumId { get; set; }
+
+
+    protected override async Task OnInitializedAsync()
+    {
+        album = await MusicStoreService.GetAlbumAsync(AlbumId);
+    }
+
+    async Task AddToCart(int albumId)
+    {
+        var cartId = AppState.ShippingCartId;
+        await MusicStoreService.AddToCart(albumId, cartId);
+        AppState.IncrementCartCount();
+        NavManager.NavigateTo("/");
+    }
+
+
+}

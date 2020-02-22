@@ -1,0 +1,22 @@
+﻿@using BlazorMusicStore.Data
+@using Microsoft.AspNetCore.Components
+@inject MusicStoreService MusicStoreService
+
+
+    <ul id="categories">
+        @foreach (var g in genres)
+        {
+            <li><a href="/browse/@g.GenreId">@g.Name</a></li>
+        }
+    </ul>
+
+
+
+@code {
+    List<Genre> genres;
+
+    protected override async Task OnInitializedAsync()
+    {
+        genres = await MusicStoreService.GetGenresAsync();
+    }
+}

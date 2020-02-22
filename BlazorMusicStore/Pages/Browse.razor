@@ -1,0 +1,50 @@
+﻿@page "/browse/{GenreId:int}"
+@using BlazorMusicStore.Data
+@inject MusicStoreService MusicStoreService
+
+@if (browseItems == null || genre == null)
+{
+    <p><em>Loading...</em></p>
+}
+else
+{
+    <h3><em>@genre.Name</em> Albums</h3>
+
+    <div class="album-cards">
+        <ul id="album-list">
+            @foreach (var album in browseItems)
+            {
+                <li>
+                    <a href="/details/@album.AlbumId">
+                        <img alt="@album.Title" src="@album.AlbumArtUrl" />
+                        <span>@album.Title</span>
+                    </a>
+                </li>
+            }
+        </ul>
+    </div>
+}
+
+
+@code {
+
+    List<Album> browseItems;
+    Genre genre;
+
+    [Parameter]
+    public int GenreId { get; set; }
+
+    protected override async Task OnInitializedAsync()
+    {
+        browseItems = await MusicStoreService.GetAlbumsByGenre(GenreId);
+        genre = await MusicStoreService.GetGenre(GenreId);
+    }
+
+    protected override async Task OnParametersSetAsync()
+    {
+        browseItems = await MusicStoreService.GetAlbumsByGenre(GenreId);
+        genre = await MusicStoreService.GetGenre(GenreId);
+
+    }
+
+}

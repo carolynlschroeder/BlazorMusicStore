@@ -1,0 +1,62 @@
+﻿@page "/addresspayment"
+@using BlazorMusicStore.Data
+@inject MusicStoreService MusicStoreService
+@inject AppState AppState
+@inject NavigationManager NavManager
+
+<h2>Address And Payment</h2>
+<EditForm EditContext="@_editContext" OnSubmit="@HandleSubmit">
+    <fieldset>
+        <legend>Shipping Information</legend>
+        <div><label>First Name</label></div>
+        <div><InputText @bind-Value="order.FirstName" /></div>
+        <div><label>Last Name</label></div>
+        <div><InputText @bind-Value="order.LastName" /></div>
+        <div><label>Address</label></div>
+        <div><InputText @bind-Value="order.Address" /></div>
+        <div><label>City</label></div>
+        <div><InputText @bind-Value="order.City" /></div>
+        <div><label>State</label></div>
+        <div><InputText @bind-Value="order.State" /></div>
+        <div><label>Postal Code</label></div>
+        <div><InputText @bind-Value="order.PostalCode" /></div>
+        <div><label>Country</label></div>
+        <div><InputText @bind-Value="order.Country" /></div>
+        <div><label>Phone</label></div>
+        <div><InputText @bind-Value="order.Phone" /></div>
+        <div><label>Email</label></div>
+        <div><InputText @bind-Value="order.Email" /></div>
+
+    </fieldset>
+    <fieldset>
+        <legend>Payment</legend>
+        <p>We're running a promotion: all music is free with the promo code: "FREE"</p>
+
+        <div>
+            Promo Code
+        </div>
+        <div><InputText @bind-Value="promoCode" /></div>
+    </fieldset>
+    <button type="submit">Submit Order</button>
+</EditForm>
+
+@code {
+    Order order = new Order();
+     private EditContext _editContext;
+    String promoCode;
+
+     protected override void OnInitialized()
+    {
+        _editContext = new EditContext(order);
+    }
+
+    async void HandleSubmit()
+    {
+        var shoppingCartId = AppState.ShippingCartId;
+        var orderId = await MusicStoreService.AddOrder(order, shoppingCartId, promoCode);
+        AppState.OrderNumber = orderId;
+        AppState.ZeroOutCartCount();
+        NavManager.NavigateTo("/complete");
+    }
+
+}

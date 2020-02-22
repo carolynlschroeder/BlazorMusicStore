@@ -1,0 +1,86 @@
+﻿@page "/shoppingCart"
+@using BlazorMusicStore.Data
+@inject MusicStoreService MusicStoreService
+@inject AppState AppState
+@inject NavigationManager NavManager
+
+<h3>
+    <em>Review</em> your cart:
+</h3>
+<button class="button" @onclick="@GoToCheckout">Checkout >></button>
+<div id="update-message">
+    @message
+</div>
+<table class="table">
+    <tr>
+        <th>
+            Album Name
+        </th>
+        <th>
+            Price (each)
+        </th>
+        <th>
+            Quantity
+        </th>
+        <th></th>
+    </tr>
+    @foreach (var item in cartItems)
+    {
+        <tr>
+            <td>
+                <a href="/details/@item.AlbumId">@item.Album.Title</a>
+            </td>
+            <td>
+                @item.Album.Price
+            </td>
+            <td id="item-count-@item.RecordId">
+                @item.Count
+            </td>
+            <td>
+                <button class="RemoveLink" @onclick="@(() => Remove(item.RecordId))">Remove from Cart</button>
+            </td>
+        </tr>
+    }
+    <tr>
+        <td>
+            Total
+        </td>
+        <td>
+        </td>
+        <td>
+        </td>
+        <td id="cart-total">
+            @total
+        </td>
+    </tr>
+</table>
+
+@code {
+    List<Cart> cartItems;
+    decimal total;
+    string message = String.Empty;
+
+    protected override async Task OnInitializedAsync()
+    {
+        var cartId = AppState.ShippingCartId;
+        cartItems = await MusicStoreService.GetCartItems(cartId);
+        total = cartItems.Any() ? cartItems.Sum(c => c.Album.Price * c.Count) : 0;
+    }
+
+    async void Remove(int id)
+    {
+        var albumName = await MusicStoreService.RemoveFromCart(id);
+        AppState.DecrementCartCount();
+        var cartId = AppState.ShippingCartId;
+        cartItems = await MusicStoreService.GetCartItems(cartId);
+        total = cartItems.Any() ? cartItems.Sum(c => c.Album.Price * c.Count) : 0;
+        message = $"{albumName} has been removed from your cart";
+        StateHasChanged();
+
+    }
+
+    void GoToCheckout()
+    {
+        NavManager.NavigateTo("/addresspayment");
+    }
+}
