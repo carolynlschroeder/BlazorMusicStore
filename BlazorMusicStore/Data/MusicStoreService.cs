@@ -48,7 +48,7 @@ namespace BlazorMusicStore.Data
 
         public Task<List<Cart>> GetCartItems(string shoppingCartId)
         {
-            return Task.FromResult(_context.Cart.Include("Album").Where(c => c.CartId == shoppingCartId  && c.Count > 0).ToList());
+            return Task.FromResult(_context.Cart.Include("Album").Where(c => c.CartId == shoppingCartId).ToList());
         }
 
         public async Task AddToCart(int albumId, string shoppingCartId)
@@ -80,7 +80,7 @@ namespace BlazorMusicStore.Data
 
             var name = cart.Album.Title;
 
-            if(cart.Count > 0)
+            if(cart.Count > 1)
             {
                 cart.Count--;
             }
@@ -100,8 +100,9 @@ namespace BlazorMusicStore.Data
             var cartItems = await GetCartItems(shoppingCartId);
             if (promoCode != "FREE")
             {
-                order.Total = cartItems.Any() ? cartItems.Sum(c => c.Count * c.Album.Price) : 0;
+                orderTotal = cartItems.Any() ? cartItems.Sum(c => c.Count * c.Album.Price) : 0;
             }
+            order.Total = orderTotal;
             order.OrderDate = DateTime.Now;
             order.Username = "Guest";
             
